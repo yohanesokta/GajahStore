@@ -3,7 +3,7 @@
 
 <footer>
     <div class="container">
-        <p>&copy; <?= date('Y') ?> GameStore. All Rights Reserved. Built by Gemini.</p>
+        <p>&copy; <?= date('Y') ?> GameStore. All Rights Reserved. Built by <a href="https://www.gajahweb.tech">Gajahweb</a>.</p>
     </div>
 </footer>
 

@@ -17,7 +17,7 @@
 
             <form action="/order/<?= $game['id'] ?>" method="POST" style="margin-top: 1.5rem;">
                 <input type="hidden" name="amount" value="<?= $game['price'] ?>">
-                <button type="submit" class="btn btn-primary">Top-up Now</button>
+                <button type="submit" class="btn btn-primary">Buy Now</button>
             </form>
         </div>
     </div>

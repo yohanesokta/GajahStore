@@ -6,8 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Welcome to GameStore</h1>
-<p style="text-align: center; color: var(--color-grey); max-width: 600px; margin: 0 auto 2rem auto;">The best place to top up your favorite games. Fast, secure, and reliable.</p>
+    <h1 style="">Welcome to GameStore</h1>
+<p style="color: var(--color-grey); max-width: 600px; margin: 0 0 2rem 0;">The best place to top up your favorite games. Fast, secure, and reliable.</p>
 
 <div class="search-bar">
     <form action="/" method="GET">
