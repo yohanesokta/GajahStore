@@ -1,23 +1,37 @@
 <?php $game = $data['game']; ?>
 <div class="game-detail-container">
     <div class="game-header">
-        <img src="/<?= htmlspecialchars($game['image_url']) ?>" alt="<?= htmlspecialchars($game['title']) ?>">
+        <img src="/<?= htmlspecialchars($game['URLGambar']) ?>" alt="<?= htmlspecialchars($game['Judul']) ?>">
         <div class="game-info">
-            <h1><?= htmlspecialchars($game['title']) ?></h1>
-            <p><?= htmlspecialchars($game['genre']) ?> | <?= htmlspecialchars($game['platform_name']) ?></p>
+            <h1><?= htmlspecialchars($game['Judul']) ?></h1>
+            <p><?= htmlspecialchars($game['Genre']) ?> | <?= htmlspecialchars($game['NamaPlatform']) ?></p>
             <div class="rating-summary">
                 <span class="stars" style="--rating: <?= $data['avgRating'] ?>;" title="Average rating: <?= $data['avgRating'] ?> out of 5"></span>
                 <span>(<?= $data['avgRating'] ?? 0 ?>/5.0) based on <?= $data['ratingCount'] ?> reviews</span>
             </div>
-            <div class="price">Rp. <?= number_format($game['price']) ?></div>
+
+            <div class="stock-info" style="margin-top: 1rem; font-size: 1.2rem;">
+                <strong>Stok Tersedia:</strong> 
+                <span style="font-weight: bold; color: <?= $data['stockCount'] > 0 ? 'green' : 'red' ?>;">
+                    <?= htmlspecialchars($data['stockCount']) ?>
+                </span>
+            </div>
             
             <?php if (isset($_GET['error'])): ?>
-                <div class="alert alert-danger" style="margin-top:10px;">Error: <?= htmlspecialchars($_GET['error']) ?></div>
+                <div class="alert alert-danger" style="margin-top:10px;">
+                    <?php 
+                        if ($_GET['error'] === 'no_stock') echo 'Maaf, stok kaset untuk game ini sudah habis.';
+                        else echo 'Gagal membuat transaksi sewa.';
+                    ?>
+                </div>
             <?php endif; ?>
 
-            <form action="/order/<?= $game['id'] ?>" method="POST" style="margin-top: 1.5rem;">
-                <input type="hidden" name="amount" value="<?= $game['price'] ?>">
-                <button type="submit" class="btn btn-primary">Buy Now</button>
+            <form action="/rent/<?= $game['IDGame'] ?>" method="POST" style="margin-top: 1.5rem;">
+                <?php if ($data['stockCount'] > 0): ?>
+                    <button type="submit" class="btn btn-primary">Sewa Sekarang</button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-primary" disabled>Stok Habis</button>
+                <?php endif; ?>
             </form>
         </div>
     </div>
@@ -27,48 +41,48 @@
             <h2>Ratings & Reviews</h2>
             <div class="review-grid">
                 <div class="review-form form-container" style="margin: 0;">
-                    <h3>Leave Your Review</h3>
+                    <h3>Tinggalkan Ulasan Anda</h3>
                     <?php if (isset($_GET['rated'])): ?>
-                        <div class="alert alert-success">Thank you for your review!</div>
+                        <div class="alert alert-success">Terima kasih atas ulasan Anda!</div>
                     <?php endif; ?>
                      <?php if (isset($_GET['error']) && $_GET['error'] === 'rating_missing'): ?>
-                        <div class="alert alert-danger">Please select a star rating.</div>
+                        <div class="alert alert-danger">Harap pilih rating bintang.</div>
                     <?php endif; ?>
-                    <form action="/rate/<?= $game['id'] ?>" method="POST">
+                    <form action="/rate/<?= $game['IDGame'] ?>" method="POST">
                         <div class="form-group">
-                            <label>Your Rating</label>
+                            <label>Rating Anda</label>
                             <div class="star-rating" style='display:flex; width:100%; justify-content:center;'>
-                                <input type="radio" id="star5" name="rating" value="5" <?= ($data['userRating']['rating'] ?? 0) == 5 ? 'checked' : '' ?>/><label for="star5" title="5 stars">★</label>
-                                <input type="radio" id="star4" name="rating" value="4" <?= ($data['userRating']['rating'] ?? 0) == 4 ? 'checked' : '' ?>/><label for="star4" title="4 stars">★</label>
-                                <input type="radio" id="star3" name="rating" value="3" <?= ($data['userRating']['rating'] ?? 0) == 3 ? 'checked' : '' ?>/><label for="star3" title="3 stars">★</label>
-                                <input type="radio" id="star2" name="rating" value="2" <?= ($data['userRating']['rating'] ?? 0) == 2 ? 'checked' : '' ?>/><label for="star2" title="2 stars">★</label>
-                                <input type="radio" id="star1" name="rating" value="1" <?= ($data['userRating']['rating'] ?? 0) == 1 ? 'checked' : '' ?>/><label for="star1" title="1 star">★</label>
+                                <input type="radio" id="star5" name="rating" value="5" <?= ($data['userRating']['Skor'] ?? 0) == 5 ? 'checked' : '' ?>/><label for="star5" title="5 stars">★</label>
+                                <input type="radio" id="star4" name="rating" value="4" <?= ($data['userRating']['Skor'] ?? 0) == 4 ? 'checked' : '' ?>/><label for="star4" title="4 stars">★</label>
+                                <input type="radio" id="star3" name="rating" value="3" <?= ($data['userRating']['Skor'] ?? 0) == 3 ? 'checked' : '' ?>/><label for="star3" title="3 stars">★</label>
+                                <input type="radio" id="star2" name="rating" value="2" <?= ($data['userRating']['Skor'] ?? 0) == 2 ? 'checked' : '' ?>/><label for="star2" title="2 stars">★</label>
+                                <input type="radio" id="star1" name="rating" value="1" <?= ($data['userRating']['Skor'] ?? 0) == 1 ? 'checked' : '' ?>/><label for="star1" title="1 star">★</label>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="review">Your Review (optional)</label>
-                            <textarea id="review" name="review" rows="4" placeholder="Tell others what you think..."><?= htmlspecialchars($data['userRating']['review'] ?? '') ?></textarea>
+                            <label for="review">Ulasan Anda (opsional)</label>
+                            <textarea id="review" name="review" rows="4" placeholder="Bagaimana menurut Anda game ini?"><?= htmlspecialchars($data['userRating']['Ulasan'] ?? '') ?></textarea>
                         </div>
-                        <button type="submit" class="btn" style="width: 100%;">Submit Review</button>
+                        <button type="submit" class="btn" style="width: 100%;">Kirim Ulasan</button>
                     </form>
                 </div>
 
                 <div class="review-list">
                     <?php if (empty($data['reviews'])): ?>
-                        <p>No reviews yet. Be the first to review this game!</p>
+                        <p>Belum ada ulasan. Jadilah yang pertama mengulas game ini!</p>
                     <?php else: ?>
                         <?php foreach ($data['reviews'] as $review): ?>
                             <div class="review-card">
-                                <div class="review-author"><strong><?= htmlspecialchars($review['user_name']) ?></strong></div>
+                                <div class="review-author"><strong><?= htmlspecialchars($review['NamaPengguna']) ?></strong></div>
                                 <div class="review-rating">
-                                    <span class="stars" style="--rating: <?= $review['rating'] ?>;"></span>
+                                    <span class="stars" style="--rating: <?= $review['Skor'] ?>;"></span>
                                 </div>
-                                <?php if(!empty($review['review'])): ?>
+                                <?php if(!empty($review['Ulasan'])): ?>
                                 <p class="review-text">
-                                    <?= nl2br(htmlspecialchars($review['review'])) ?>
+                                    <?= nl2br(htmlspecialchars($review['Ulasan'])) ?>
                                 </p>
                                 <?php endif; ?>
-                                <div class="review-date" style="font-size: 0.8rem; color: var(--color-grey); text-align: right;"><?= date('d M Y', strtotime($review['created_at'])) ?></div>
+                                <div class="review-date" style="font-size: 0.8rem; color: var(--color-grey); text-align: right;"><?= date('d M Y', strtotime($review['TglRating'])) ?></div>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -97,3 +111,4 @@
         }
     }
 </style>
+

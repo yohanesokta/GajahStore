@@ -1,38 +1,45 @@
-<h1>My Order History</h1>
+<h1>Riwayat Sewa Saya</h1>
 
-<?php if (isset($_GET['order_success'])): ?>
-    <div class="alert alert-success">Your order was placed successfully!</div>
+<?php if (isset($_GET['rental_success'])): ?>
+    <div class="alert alert-success">Transaksi sewa Anda berhasil!</div>
 <?php endif; ?>
 
-<?php if (empty($data['orders'])): ?>
-    <p style="text-align: center;">You have not placed any orders yet. <a href="/">Browse games</a></p>
+<?php if (empty($data['transaksi'])): ?>
+    <p style="text-align: center;">Anda belum pernah melakukan penyewaan. <a href="/">Lihat-lihat game</a></p>
 <?php else: ?>
     <div class="table-responsive">
         <table class="styled-table">
             <thead>
                 <tr>
-                    <th>Order ID</th>
-                    <th>Date</th>
-                    <th>Game</th>
-                    <th>Amount</th>
+                    <th>No. Nota</th>
+                    <th>Tgl. Sewa</th>
+                    <th>Wajib Kembali</th>
+                    <th>Item Sewa</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($data['orders'] as $order): ?>
+                <?php foreach ($data['transaksi'] as $tx): ?>
                     <tr>
-                        <td>#<?= $order['order_uid']?></td>
-                        <td><?= date('d M Y, H:i', strtotime($order['order_date'])) ?></td>
+                        <td style="font-family: monospace;">#<?= htmlspecialchars($tx['NomorNota'])?></td>
+                        <td><?= date('d M Y', strtotime($tx['TglSewa'])) ?></td>
+                        <td><?= date('d M Y', strtotime($tx['TglWajibKembali'])) ?></td>
                         <td>
-                            <img src="/<?= htmlspecialchars($order['game_image']) ?>" alt="" style="width: 40px; border-radius: 4px; vertical-align: middle; margin-right: 10px;">
-                            <?= htmlspecialchars($order['game_title']) ?>
+                            <?php if (empty($tx['details'])): ?>
+                                <span>-</span>
+                            <?php else: ?>
+                                <ul style="margin: 0; padding-left: 20px;">
+                                    <?php foreach($tx['details'] as $item): ?>
+                                        <li><?= htmlspecialchars($item['Judul']) ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
                         </td>
-                        <td>Rp. <?= number_format($order['amount']) ?></td>
                         <td>
-                        <span class="status status-<?= htmlspecialchars($order['status']) ?>"><?= ucfirst(htmlspecialchars($order['status'])) ?></span>
-                        <?php if ($order['status'] == 'pending') { ?>
-                        <a style="background-color:green; color:white; padding:5px 10px; border-radius:20px; font-size:11pt;" href="/payment/simulate/<?= $order['order_uid']?>">Bayar</a>    
-                        <?php } ?>
+                            <span class="status status-<?= htmlspecialchars($tx['Status']) ?>"><?= ucfirst(htmlspecialchars($tx['Status'])) ?></span>
+                            <?php if ($tx['Status'] == 'pending') { ?>
+                                <a style="background-color:green; color:white; padding:5px 10px; border-radius:20px; font-size:11pt; text-decoration: none; margin-left: 5px;" href="/payment/simulate/<?= $tx['NomorNota']?>">Konfirmasi</a>    
+                            <?php } ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -44,7 +51,8 @@
 <style>
 /* This is a temporary solution to style status, will be moved to main.css later if needed */
 .status { padding: 5px 10px; border-radius: 15px; color: #fff; font-size: 0.8rem; text-transform: capitalize; }
+.status-active { background-color: #007bff; }
 .status-completed { background-color: var(--color-success); }
-.status-pending { background-color: #ffc107; color: var(--color-bg); }
+.status-pending { background-color: #ffc107; color: #333; }
 .status-cancelled { background-color: var(--color-danger); }
 </style>

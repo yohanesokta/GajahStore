@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1 style="">Welcome to GameStore</h1>
-<p style="color: var(--color-grey); max-width: 600px; margin: 0 0 2rem 0;">The best place to top up your favorite games. Fast, secure, and reliable.</p>
+<p style="color: var(--color-grey); max-width: 600px; margin: 0 0 2rem 0;">The best place to rent your favorite games. Fast, secure, and reliable.</p>
 
 <div class="search-bar">
     <form action="/" method="GET">
@@ -24,17 +24,16 @@
     <div class="game-grid">
         <?php foreach ($data['games'] as $game): ?>
             <div class="game-card">
-                <img src="/<?= htmlspecialchars($game['image_url']) ?>" alt="<?= htmlspecialchars($game['title']) ?>">
+                <img src="/<?= htmlspecialchars($game['URLGambar'] ?? '') ?>" alt="<?= htmlspecialchars($game['Judul'] ?? '') ?>">
                 <div class="game-card-content">
-                    <h3><?= htmlspecialchars($game['title']) ?></h3>
+                    <h3><?= htmlspecialchars($game['Judul'] ?? '') ?></h3>
                     <p>
-                        <span class="genre"><?= htmlspecialchars($game['genre']) ?></span> | 
-                        <span class="platform"><?= htmlspecialchars($game['platform_name']) ?></span>
+                        <span class="genre"><?= htmlspecialchars($game['Genre'] ?? '') ?></span> | 
+                        <span class="platform"><?= htmlspecialchars($game['NamaPlatform'] ?? '') ?></span>
                     </p>
                 </div>
                 <div class="game-card-footer">
-                    <span class="price">Rp. <?= number_format($game['price']) ?></span>
-                    <a href="/game/<?= $game['id'] ?>" class="btn">Details</a>
+                    <a href="/game/<?= $game['IDGame'] ?>" class="btn">Details</a>
                 </div>
             </div>
         <?php endforeach; ?>

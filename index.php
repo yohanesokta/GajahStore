@@ -75,10 +75,10 @@ if ($controllerName === 'home' || $controllerName === '' || $controllerName === 
     $userController = loadController('user', $pdo);
     if ($userController) $userController->show($methodName); else notFound();
 
-// Game Order (Initiates payment flow)
-} elseif ($controllerName === 'order' && $methodName) {
+// Game Rental (Initiates rental flow)
+} elseif ($controllerName === 'rent' && $methodName) {
     $userController = loadController('user', $pdo);
-    if ($userController) $userController->order($methodName); else notFound();
+    if ($userController) $userController->rent($methodName); else notFound();
 
 // Payment Processing
 } elseif ($controllerName === 'payment' && $methodName) {
@@ -108,7 +108,6 @@ if ($controllerName === 'home' || $controllerName === '' || $controllerName === 
     // /admin/games -> games()
     // /admin/games/edit/1 -> editGame(1)
     // /admin/games/new -> editGame()
-    // /admin/reports/topselling -> topSelling()
     if ($methodName === 'index' && !$param1) {
         $adminController->index();
     } elseif ($methodName === 'games') {
@@ -121,10 +120,12 @@ if ($controllerName === 'home' || $controllerName === '' || $controllerName === 
         elseif ($param1 === 'new') $adminController->editUser();
         elseif ($param1 === 'delete' && $param2) $adminController->deleteUser($param2);
         else $adminController->users();
-    } elseif ($methodName === 'orders') {
-        $adminController->orders();
-    } elseif ($methodName === 'reports' && $param1 === 'topselling') { // New route for top selling report
-        $adminController->topSelling();
+    } elseif ($methodName === 'transaksi') { // Renamed from 'orders'
+        $adminController->transaksi();
+    } elseif ($methodName === 'addstock' && $param1 && $_SERVER['REQUEST_METHOD'] === 'POST') { // New route for adding stock
+        $adminController->addStock($param1);
+    } elseif ($methodName === 'deletekaset' && $param1 && $param2) { // New route for deleting a kaset
+        $adminController->deleteKaset($param1, $param2);
     } else {
         // Fallback for any other /admin/method calls
         if(method_exists($adminController, $methodName)) {

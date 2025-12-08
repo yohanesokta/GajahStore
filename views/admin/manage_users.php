@@ -24,14 +24,14 @@
             <?php else: ?>
                 <?php foreach ($data['users'] as $user): ?>
                     <tr>
-                        <td><?= $user['id'] ?></td>
-                        <td><?= htmlspecialchars($user['name']) ?></td>
-                        <td><?= htmlspecialchars($user['email']) ?></td>
-                        <td><?= htmlspecialchars($user['role']) ?></td>
+                        <td><?= htmlspecialchars($user['IDPengguna'] ?? '') ?></td>
+                        <td><?= htmlspecialchars($user['Nama'] ?? '') ?></td>
+                        <td><?= htmlspecialchars($user['Email'] ?? '') ?></td>
+                        <td><?= htmlspecialchars($user['Role'] ?? '') ?></td>
                         <td class="action-links">
-                            <a href="/admin/users/edit/<?= $user['id'] ?>">Edit</a>
-                            <?php if ($_SESSION['user_id'] != $user['id']): // Prevent self-delete button from showing ?>
-                            <a href="/admin/users/delete/<?= $user['id'] ?>" onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.')" class="delete">Delete</a>
+                            <a href="/admin/users/edit/<?= htmlspecialchars($user['IDPengguna'] ?? '') ?>">Edit</a>
+                            <?php if ($_SESSION['user_id'] != ($user['IDPengguna'] ?? '')): // Prevent self-delete button from showing ?>
+                            <a href="/admin/users/delete/<?= htmlspecialchars($user['IDPengguna'] ?? '') ?>" onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.')" class="delete">Delete</a>
                             <?php endif; ?>
                         </td>
                     </tr>

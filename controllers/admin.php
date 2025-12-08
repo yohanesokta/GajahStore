@@ -3,7 +3,8 @@ require_once 'base.php';
 require_once 'models/AdminModel.php';
 require_once 'models/GameModel.php';
 require_once 'models/UserModel.php';
-require_once 'models/OrderModel.php';
+require_once 'models/TransaksiModel.php';
+require_once 'models/KasetModel.php';
 
 class AdminController extends BaseController {
 
@@ -30,20 +31,24 @@ class AdminController extends BaseController {
         $this->view('admin/manage_users', ['title' => 'Manage Users', 'users' => $users]);
     }
     
-    public function orders() {
-        $orderModel = new OrderModel($this->db);
-        $orders = $orderModel->findAll();
-        $this->view('admin/manage_orders', ['title' => 'Manage Orders', 'orders' => $orders]);
+    public function transaksi() {
+        $transaksiModel = new TransaksiModel($this->db);
+        $transaksi = $transaksiModel->findAllForAdmin();
+        $this->view('admin/manage_rentals', ['title' => 'Manage Rentals', 'rentals' => $transaksi]);
     }
 
     public function editGame($id = null) {
         $gameModel = new GameModel($this->db);
+        $kasetModel = new KasetModel($this->db);
+        
         $platforms = $gameModel->getPlatforms();
         $game = null;
+        $kasets = [];
         $title = 'Add New Game';
 
         if ($id) {
             $game = $gameModel->findById($id);
+            $kasets = $kasetModel->findAllByGameId($id);
             $title = 'Edit Game';
         }
 
@@ -51,13 +56,9 @@ class AdminController extends BaseController {
             $title_post = $_POST['title'] ?? '';
             $genre = $_POST['genre'] ?? '';
             $platform_id = $_POST['platform_id'] ?? 0;
-            // Harga sekarang adalah integer, mata uang ditambahkan
-            $price = (int)($_POST['price'] ?? 0);
-            $currency = $_POST['currency'] ?? 'USD';
             
-            $image_url = $game['image_url'] ?? null;
+            $image_url = $game['URLGambar'] ?? null;
 
-            // Logika upload file
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
                 $target_dir = "public/images/";
                 if (!is_dir($target_dir)) {
@@ -71,9 +72,9 @@ class AdminController extends BaseController {
             }
 
             if ($id) { // Update game
-                $gameModel->update($id, $title_post, $genre, $platform_id, $price, $currency, $image_url);
+                $gameModel->update($id, $title_post, $genre, $platform_id, $image_url);
             } else { // Buat game baru
-                $gameModel->create($title_post, $genre, $platform_id, $price, $currency, $image_url);
+                $gameModel->create($title_post, $genre, $platform_id, $image_url);
             }
             $this->redirect('/admin/games');
         }
@@ -81,21 +82,29 @@ class AdminController extends BaseController {
         $this->view('admin/edit_game', [
             'title' => $title,
             'game' => $game,
-            'platforms' => $platforms
+            'platforms' => $platforms,
+            'kasets' => $kasets
         ]);
     }
     
-    /**
-     * Menampilkan halaman laporan game terlaris.
-     */
-    public function topSelling() {
-        $gameModel = new GameModel($this->db);
-        $topGames = $gameModel->topSelling(5); // Ambil top 5
-
-        $this->view('admin/report_top_selling', [
-            'title' => 'Top 5 Selling Games',
-            'topGames' => $topGames
-        ]);
+    public function addStock($game_id) {
+        $this->requireAdmin();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quantity'])) {
+            $quantity = (int)$_POST['quantity'];
+            if ($quantity > 0) {
+                $kasetModel = new KasetModel($this->db);
+                $kasetModel->addStock($game_id, $quantity);
+            }
+        }
+        $this->redirect('/admin/games/edit/' . $game_id);
+    }
+    
+    public function deleteKaset($game_id, $kaset_id) {
+        $this->requireAdmin();
+        $kasetModel = new KasetModel($this->db);
+        // Tambahan: Sebaiknya ada pengecekan apakah kaset sedang disewa
+        $kasetModel->delete($kaset_id);
+        $this->redirect('/admin/games/edit/' . $game_id);
     }
     
     public function deleteGame($id) {
@@ -122,7 +131,6 @@ class AdminController extends BaseController {
 
             if ($id) { // Update
                 $userModel->update($id, $name, $email, $role);
-                // Password change is handled separately or requires confirmation
             } else { // Create
                 if(!empty($password)){
                     $userModel->register($name, $email, $password);
@@ -138,7 +146,6 @@ class AdminController extends BaseController {
     }
     
     public function deleteUser($id) {
-        // Prevent admin from deleting themselves
         if ($id == $_SESSION['user_id']) {
             $this->redirect('/admin/users?error=self_delete');
         }

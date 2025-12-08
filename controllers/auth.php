@@ -19,13 +19,14 @@ class AuthController extends BaseController {
             $user = $userModel->login($email, $password);
 
             if ($user) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['name'];
-                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['user_id'] = $user['IDPengguna'];
+                $_SESSION['user_name'] = $user['Nama'];
+                $_SESSION['user_role'] = $user['Role'];
                 
-                if ($user['role'] === 'admin') {
+                if ($user['Role'] === 'admin') {
                     $this->redirect('/admin');
-                } else {
+                }
+                else {
                     $this->redirect('/');
                 }
             } else {
@@ -62,11 +63,13 @@ class AuthController extends BaseController {
             if (empty($errors)) {
                 if ($userModel->register($name, $email, $password)) {
                     $this->redirect('/login?registered=true');
-                } else {
-                    $errors[] = "Registration failed. Please try again.";
-                    $this->view('register', ['errors' => $errors, 'title' => 'Register']);
                 }
-            } else {
+                else {
+                    $errors[] = "Registration failed. Please try again.";
+                    $this->view('register', ['errors' => $errors, 'name' => $name, 'email' => $email, 'title' => 'Register']);
+                }
+            }
+            else {
                 $this->view('register', ['errors' => $errors, 'name' => $name, 'email' => $email, 'title' => 'Register']);
             }
 

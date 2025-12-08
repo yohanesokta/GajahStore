@@ -11,28 +11,26 @@
                 <th>Title</th>
                 <th>Genre</th>
                 <th>Platform</th>
-                <th>Price</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($data['games'])): ?>
                 <tr>
-                    <td colspan="7" style="text-align: center;">No games found.</td>
+                    <td colspan="6" style="text-align: center;">No games found.</td>
                 </tr>
             <?php else: ?>
                 <?php $no=0; foreach ($data['games'] as $game): $no++;?>
                     <tr>
                         <td><?=$no?></td>
-                        <td><?= $game['id'] ?></td>
-                        <td><img src="/<?= htmlspecialchars($game['image_url']) ?>" alt="" style="width: 50px; border-radius: 4px;"></td>
-                        <td><?= htmlspecialchars($game['title']) ?></td>
-                        <td><?= htmlspecialchars($game['genre']) ?></td>
-                        <td><?= htmlspecialchars($game['platform_name']) ?></td>
-                        <td>Rp. <?= number_format($game['price']) ?></td>
+                        <td><?= htmlspecialchars($game['IDGame'] ?? '') ?></td>
+                        <td><img src="/<?= htmlspecialchars($game['URLGambar'] ?? '') ?>" alt="<?= htmlspecialchars($game['Judul'] ?? '') ?>" style="width: 50px; border-radius: 4px;"></td>
+                        <td><?= htmlspecialchars($game['Judul'] ?? '') ?></td>
+                        <td><?= htmlspecialchars($game['Genre'] ?? '') ?></td>
+                        <td><?= htmlspecialchars($game['NamaPlatform'] ?? '') ?></td>
                         <td class="action-links">
-                            <a href="/admin/games/edit/<?= $game['id'] ?>">Edit</a>
-                            <a href="/admin/games/delete/<?= $game['id'] ?>" onclick="return confirm('Are you sure you want to delete this game?')" class="delete">Delete</a>
+                            <a href="/admin/games/edit/<?= htmlspecialchars($game['IDGame'] ?? '') ?>">Edit</a>
+                            <a href="/admin/games/delete/<?= htmlspecialchars($game['IDGame'] ?? '') ?>" onclick="return confirm('Are you sure you want to delete this game?')" class="delete">Delete</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

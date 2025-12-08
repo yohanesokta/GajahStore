@@ -2,96 +2,96 @@
 // controllers/PaymentController.php
 
 require_once 'base.php';
-require_once 'models/OrderModel.php';
+require_once 'models/TransaksiModel.php';
 
 class PaymentController extends BaseController {
 
     public function __construct($db) {
         parent::__construct($db);
-        // Memastikan hanya user yang sudah login yang bisa mengakses halaman pembayaran
         $this->requireLogin();
     }
 
     /**
-     * Menampilkan halaman simulasi pembayaran untuk order tertentu.
+     * Menampilkan halaman simulasi konfirmasi sewa untuk transaksi tertentu.
      *
-     * @param string $order_uid
+     * @param string $nomorNota
      */
-    public function simulate($order_uid) {
-        $orderModel = new OrderModel($this->db);
-        $order = $orderModel->findByUid($order_uid);
+    public function simulate($nomorNota) {
+        $transaksiModel = new TransaksiModel($this->db);
+        $transaksi = $transaksiModel->findByNomorNota($nomorNota);
 
-        // Validasi: order harus ada, milik user yang login, dan statusnya 'pending'
-        if (!$order || $order['user_id'] != $_SESSION['user_id'] || $order['status'] != 'pending') {
+        // Validasi: transaksi harus ada, milik user yang login, dan statusnya 'pending'
+        if (!$transaksi || $transaksi['IDPengguna'] != $_SESSION['user_id'] || $transaksi['Status'] != 'pending') {
             $this->redirect('/history');
             return;
         }
+        
+        $details = $transaksiModel->findDetailsByNomorNota($nomorNota);
 
-        // Membuat URL untuk gambar QR placeholder dari layanan eksternal
-        $qr_data = "order_id:{$order['order_uid']},amount:{$order['amount']}{$order['currency']}";
+        // Membuat URL untuk gambar QR placeholder
+        $qr_data = "nomor_nota:{$transaksi['NomorNota']},user_id:{$transaksi['IDPengguna']}";
         $qr_code_url = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($qr_data);
 
-        $this->view('payment/qris_simulate', [
-            'title' => 'Simulasi Pembayaran',
-            'order' => $order,
+        // Mengganti nama view ke `rental/confirm`
+        $this->view('rental/confirm', [
+            'title' => 'Konfirmasi Penyewaan',
+            'transaksi' => $transaksi,
+            'details' => $details,
             'qr_code_url' => $qr_code_url
         ]);
     }
 
     /**
-     * Memproses konfirmasi pembayaran yang disimulasikan.
+     * Memproses konfirmasi sewa yang disimulasikan.
      *
-     * @param string $order_uid
+     * @param string $nomorNota
      */
-    public function confirm($order_uid) {
+    public function confirm($nomorNota) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/');
             return;
         }
 
-        $orderModel = new OrderModel($this->db);
-        $order = $orderModel->findByUid($order_uid);
+        $transaksiModel = new TransaksiModel($this->db);
+        $transaksi = $transaksiModel->findByNomorNota($nomorNota);
 
         // Validasi ulang sebelum mengubah status
-        if (!$order || $order['user_id'] != $_SESSION['user_id'] || $order['status'] != 'pending') {
+        if (!$transaksi || $transaksi['IDPengguna'] != $_SESSION['user_id'] || $transaksi['Status'] != 'pending') {
             $this->redirect('/history');
             return;
         }
 
-        // Ubah status order menjadi 'paid'
-        $updated = $orderModel->updatePaymentStatus($order_uid, 'paid', 'qris_simulation');
+        // Aktifkan rental: status transaksi -> 'active', status kaset -> 'Disewa'
+        $updated = $transaksiModel->activateRental($nomorNota);
 
         if ($updated) {
-            // Logika tambahan bisa ditambahkan di sini, misalnya:
-            // - Menambahkan game ke library user
-            // - Menambah saldo dompet digital user jika ini adalah top-up
-            
             // Arahkan ke halaman sukses
-            $this->redirect('/payment/success/' . $order_uid);
+            $this->redirect('/payment/success/' . $nomorNota);
         } else {
             // Arahkan kembali dengan pesan error jika update gagal
-            $this->redirect('/payment/simulate/' . $order_uid . '?error=payment_failed');
+            $this->redirect('/payment/simulate/' . $nomorNota . '?error=activation_failed');
         }
     }
 
     /**
-     * Menampilkan halaman sukses setelah pembayaran berhasil.
+     * Menampilkan halaman sukses setelah sewa berhasil.
      *
-     * @param string $order_uid
+     * @param string $nomorNota
      */
-    public function success($order_uid) {
-        $orderModel = new OrderModel($this->db);
-        $order = $orderModel->findByUid($order_uid);
+    public function success($nomorNota) {
+        $transaksiModel = new TransaksiModel($this->db);
+        $transaksi = $transaksiModel->findByNomorNota($nomorNota);
 
-        // Validasi: pastikan user hanya melihat order miliknya
-        if (!$order || $order['user_id'] != $_SESSION['user_id']) {
+        // Validasi: pastikan user hanya melihat transaksi miliknya
+        if (!$transaksi || $transaksi['IDPengguna'] != $_SESSION['user_id']) {
             $this->redirect('/history');
             return;
         }
 
-        $this->view('payment/payment_success', [
-            'title' => 'Pembayaran Berhasil',
-            'order' => $order
+        // Mengganti nama view ke `rental/success`
+        $this->view('rental/success', [
+            'title' => 'Penyewaan Berhasil',
+            'transaksi' => $transaksi
         ]);
     }
 }

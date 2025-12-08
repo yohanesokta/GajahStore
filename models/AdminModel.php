@@ -11,38 +11,39 @@ class AdminModel {
         $stats = [];
 
         // Get total users
-        $stmt = $this->db->query("SELECT COUNT(id) FROM users");
+        $stmt = $this->db->query("SELECT COUNT(IDPengguna) FROM pengguna");
         $stats['total_users'] = $stmt->fetchColumn();
 
         // Get total games
-        $stmt = $this->db->query("SELECT COUNT(id) FROM games");
+        $stmt = $this->db->query("SELECT COUNT(IDGame) FROM game");
         $stats['total_games'] = $stmt->fetchColumn();
 
-        // Get total orders
-        $stmt = $this->db->query("SELECT COUNT(id) FROM orders");
-        $stats['total_orders'] = $stmt->fetchColumn();
+        // Get total rental transactions
+        $stmt = $this->db->query("SELECT COUNT(NomorNota) FROM transaksisewa");
+        $stats['total_rentals'] = $stmt->fetchColumn();
         
-        // Get total revenue
-        $stmt = $this->db->query("SELECT SUM(amount) FROM orders WHERE status = 'completed'");
-        $stats['total_revenue'] = $stmt->fetchColumn() ?? 0;
+        // Get active rentals
+        $stmt = $this->db->query("SELECT COUNT(NomorNota) FROM transaksisewa WHERE Status = 'active'");
+        $stats['active_rentals'] = $stmt->fetchColumn() ?? 0;
 
-        // Get popular games (by number of orders)
+        // Get top rented games
         $stmt = $this->db->query("
-            SELECT g.title, COUNT(o.id) as order_count
-            FROM games g
-            JOIN orders o ON g.id = o.game_id
-            GROUP BY g.id
-            ORDER BY order_count DESC
+            SELECT g.Judul, COUNT(ds.IDKaset) as rental_count
+            FROM game g
+            JOIN kaset k ON g.IDGame = k.IDGame
+            JOIN detailsewa ds ON k.IDKaset = ds.IDKaset
+            GROUP BY g.IDGame
+            ORDER BY rental_count DESC
             LIMIT 5
         ");
         $stats['popular_games'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Get highest rated games
         $stmt = $this->db->query("
-            SELECT g.title, AVG(r.rating) as avg_rating
-            FROM games g
-            JOIN ratings r ON g.id = r.game_id
-            GROUP BY g.id
+            SELECT g.Judul, AVG(r.Skor) as avg_rating
+            FROM game g
+            JOIN rating r ON g.IDGame = r.IDGame
+            GROUP BY g.IDGame
             ORDER BY avg_rating DESC
             LIMIT 5
         ");

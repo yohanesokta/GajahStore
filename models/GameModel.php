@@ -10,42 +10,42 @@ class GameModel {
 
     public function findAll() {
         $stmt = $this->db->query("
-            SELECT g.*, p.name AS platform_name 
-            FROM games g
-            JOIN platforms p ON g.platform_id = p.id
-            ORDER BY g.title
+            SELECT g.*, p.NamaPlatform AS NamaPlatform 
+            FROM game g
+            JOIN platform p ON g.IDPlatform = p.IDPlatform
+            ORDER BY g.Judul
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function findById($id) {
         $stmt = $this->db->prepare("
-            SELECT g.*, p.name AS platform_name 
-            FROM games g
-            JOIN platforms p ON g.platform_id = p.id
-            WHERE g.id = ?
+            SELECT g.*, p.NamaPlatform AS NamaPlatform 
+            FROM game g
+            JOIN platform p ON g.IDPlatform = p.IDPlatform
+            WHERE g.IDGame = ?
         ");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function create($title, $genre, $platform_id, $price, $currency, $image_url) {
+    public function create($title, $genre, $platform_id, $image_url) {
         $stmt = $this->db->prepare(
-            "INSERT INTO games (title, genre, platform_id, price, currency, image_url) VALUES (?, ?, ?, ?, ?, ?)"
+            "INSERT INTO game (Judul, Genre, IDPlatform, URLGambar) VALUES (?, ?, ?, ?)"
         );
-        return $stmt->execute([$title, $genre, $platform_id, $price, $currency, $image_url]);
+        return $stmt->execute([$title, $genre, $platform_id, $image_url]);
     }
 
-    public function update($id, $title, $genre, $platform_id, $price, $currency, $image_url) {
-        $sql = "UPDATE games SET title = ?, genre = ?, platform_id = ?, price = ?, currency = ?";
-        $params = [$title, $genre, $platform_id, $price, $currency];
+    public function update($id, $title, $genre, $platform_id, $image_url) {
+        $sql = "UPDATE game SET Judul = ?, Genre = ?, IDPlatform = ?";
+        $params = [$title, $genre, $platform_id];
 
         if ($image_url) {
-            $sql .= ", image_url = ?";
+            $sql .= ", URLGambar = ?";
             $params[] = $image_url;
         }
 
-        $sql .= " WHERE id = ?";
+        $sql .= " WHERE IDGame = ?";
         $params[] = $id;
 
         $stmt = $this->db->prepare($sql);
@@ -53,48 +53,23 @@ class GameModel {
     }
 
     public function delete($id) {
-        $stmt = $this->db->prepare("DELETE FROM games WHERE id = ?");
+        $stmt = $this->db->prepare("DELETE FROM game WHERE IDGame = ?");
         return $stmt->execute([$id]);
     }
     
     public function search($searchTerm) {
         $stmt = $this->db->prepare("
-            SELECT g.*, p.name AS platform_name 
-            FROM games g 
-            JOIN platforms p ON g.platform_id = p.id 
-            WHERE g.title LIKE ? OR g.genre LIKE ?
+            SELECT g.*, p.NamaPlatform AS NamaPlatform 
+            FROM game g 
+            JOIN platform p ON g.IDPlatform = p.IDPlatform 
+            WHERE g.Judul LIKE ? OR g.Genre LIKE ?
         ");
         $stmt->execute(['%' . $searchTerm . '%', '%' . $searchTerm . '%']);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getPlatforms() {
-        $stmt = $this->db->query("SELECT * FROM platforms ORDER BY name");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Mengambil daftar game yang paling banyak terjual.
-     *
-     * @param int $limit Jumlah game teratas yang ingin ditampilkan.
-     * @return array
-     */
-    public function topSelling($limit = 5) {
-        $stmt = $this->db->prepare("
-            SELECT 
-                g.id, 
-                g.title, 
-                g.image_url,
-                COUNT(o.game_id) as total_sales
-            FROM orders o
-            JOIN games g ON o.game_id = g.id
-            WHERE o.status = 'paid' AND o.type = 'game_purchase'
-            GROUP BY o.game_id
-            ORDER BY total_sales DESC
-            LIMIT :limit
-        ");
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt = $this->db->query("SELECT * FROM platform ORDER BY NamaPlatform");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -1,144 +1,127 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Dec 08, 2025 at 10:00 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
+-- Skema Basis Data untuk Aplikasi Persewaan Kaset Game
 --
--- Database: `basdat_gemini`
---
-CREATE DATABASE IF NOT EXISTS `basdat_gemini` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `basdat_gemini`;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `platforms`
+-- Struktur tabel untuk `pengguna`
 --
-
-CREATE TABLE `platforms` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `platforms`
---
-
-INSERT INTO `platforms` (`id`, `name`) VALUES
-(1, 'PC'),
-(2, 'PlayStation'),
-(3, 'Xbox'),
-(4, 'Nintendo Switch'),
-(5, 'Mobile');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `games`
---
-
-CREATE TABLE `games` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `genre` varchar(100) NOT NULL,
-  `platform_id` int(11) NOT NULL,
-  `price` decimal(10,2) NOT NULL,
-  `image_url` varchar(255) DEFAULT 'public/images/default_game.png',
-  PRIMARY KEY (`id`),
-  KEY `platform_id` (`platform_id`),
-  CONSTRAINT `games_ibfk_1` FOREIGN KEY (`platform_id`) REFERENCES `platforms` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `games`
---
-
-INSERT INTO `games` (`id`, `title`, `genre`, `platform_id`, `price`, `image_url`) VALUES
-(1, 'The Witcher 3: Wild Hunt', 'RPG', 1, '20.00', 'public/images/witcher3.jpg'),
-(2, 'Red Dead Redemption 2', 'Action-Adventure', 2, '40.00', 'public/images/rdr2.jpg'),
-(3, 'Genshin Impact', 'RPG', 5, '5.00', 'public/images/genshin.jpg'),
-(4, 'Valorant', 'FPS', 1, '10.00', 'public/images/valorant.jpg');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
-
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` enum('user','admin') NOT NULL DEFAULT 'user',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`) VALUES
-(1, 'Admin User', 'admin@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
-(2, 'Regular User', 'user@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `orders`
---
-
-CREATE TABLE `orders` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `game_id` int(11) NOT NULL,
-  `amount` decimal(10,2) NOT NULL,
-  `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
-  `status` enum('pending','completed','cancelled') NOT NULL DEFAULT 'pending',
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `game_id` (`game_id`),
-  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE
+CREATE TABLE `pengguna` (
+  `IDPengguna` int(11) NOT NULL AUTO_INCREMENT,
+  `Nama` varchar(255) NOT NULL,
+  `Email` varchar(255) NOT NULL,
+  `Password` varchar(255) NOT NULL,
+  `Role` enum('user','admin') NOT NULL DEFAULT 'user',
+  PRIMARY KEY (`IDPengguna`),
+  UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ratings`
+-- Struktur tabel untuk `platform`
+--
+CREATE TABLE `platform` (
+  `IDPlatform` int(11) NOT NULL AUTO_INCREMENT,
+  `NamaPlatform` varchar(100) NOT NULL,
+  PRIMARY KEY (`IDPlatform`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur tabel untuk `game`
+--
+CREATE TABLE `game` (
+  `IDGame` int(11) NOT NULL AUTO_INCREMENT,
+  `Judul` varchar(150) NOT NULL,
+  `Genre` varchar(100) DEFAULT NULL,
+  `IDPlatform` int(11) NOT NULL,
+  `URLGambar` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`IDGame`),
+  KEY `fk_game_platform` (`IDPlatform`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur tabel untuk `kaset` (Inventaris)
+--
+CREATE TABLE `kaset` (
+  `IDKaset` int(11) NOT NULL AUTO_INCREMENT,
+  `IDGame` int(11) NOT NULL,
+  `Status` enum('Tersedia','Disewa') NOT NULL DEFAULT 'Tersedia',
+  PRIMARY KEY (`IDKaset`),
+  KEY `fk_kaset_game` (`IDGame`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur tabel untuk `transaksisewa` (Header Transaksi)
+--
+CREATE TABLE `transaksisewa` (
+  `NomorNota` varchar(20) NOT NULL,
+  `IDPengguna` int(11) NOT NULL,
+  `TglSewa` date NOT NULL,
+  `TglWajibKembali` date NOT NULL,
+  `Status` enum('active','completed','cancelled') NOT NULL DEFAULT 'active',
+  `TglTransaksi` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`NomorNota`),
+  KEY `fk_transaksi_pengguna` (`IDPengguna`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur tabel untuk `detailsewa` (Detail Transaksi)
+--
+CREATE TABLE `detailsewa` (
+  `NomorNota` varchar(20) NOT NULL,
+  `IDKaset` int(11) NOT NULL,
+  PRIMARY KEY (`NomorNota`, `IDKaset`),
+  KEY `fk_detail_kaset` (`IDKaset`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur tabel untuk `rating`
+--
+CREATE TABLE `rating` (
+  `IDRating` int(11) NOT NULL AUTO_INCREMENT,
+  `IDPengguna` int(11) NOT NULL,
+  `IDGame` int(11) NOT NULL,
+  `Skor` int(11) DEFAULT NULL CHECK (`Skor` between 1 and 5),
+  `Ulasan` text DEFAULT NULL,
+  `TglRating` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`IDRating`),
+  KEY `fk_rating_pengguna` (`IDPengguna`),
+  KEY `fk_rating_game` (`IDGame`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+--
+-- Constraints
 --
 
-CREATE TABLE `ratings` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `game_id` int(11) NOT NULL,
-  `rating` tinyint(1) NOT NULL CHECK (`rating` >= 1 and `rating` <= 5),
-  `review` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `user_game_rating` (`user_id`,`game_id`),
-  KEY `game_id` (`game_id`),
-  CONSTRAINT `ratings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `ratings_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+ALTER TABLE `game`
+  ADD CONSTRAINT `fk_game_platform` FOREIGN KEY (`IDPlatform`) REFERENCES `platform` (`IDPlatform`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `kaset`
+  ADD CONSTRAINT `fk_kaset_game` FOREIGN KEY (`IDGame`) REFERENCES `game` (`IDGame`) ON DELETE CASCADE ON UPDATE CASCADE;
+  
+ALTER TABLE `transaksisewa`
+  ADD CONSTRAINT `fk_transaksi_pengguna` FOREIGN KEY (`IDPengguna`) REFERENCES `pengguna` (`IDPengguna`) ON UPDATE CASCADE;
+
+ALTER TABLE `detailsewa`
+  ADD CONSTRAINT `fk_detail_kaset` FOREIGN KEY (`IDKaset`) REFERENCES `kaset` (`IDKaset`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_detail_transaksi` FOREIGN KEY (`NomorNota`) REFERENCES `transaksisewa` (`NomorNota`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `rating`
+  ADD CONSTRAINT `fk_rating_game` FOREIGN KEY (`IDGame`) REFERENCES `game` (`IDGame`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_rating_pengguna` FOREIGN KEY (`IDPengguna`) REFERENCES `pengguna` (`IDPengguna`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
