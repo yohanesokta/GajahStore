@@ -8,7 +8,6 @@ class UserController extends BaseController {
 
     public function __construct($db) {
         parent::__construct($db);
-        $this->requireLogin();
     }
 
     public function index() {
@@ -25,6 +24,7 @@ class UserController extends BaseController {
     }
 
     public function history() {
+        $this->requireLogin();
         $orderModel = new OrderModel($this->db);
         $orders = $orderModel->findByUser($_SESSION['user_id']);
         $this->view('user/history', ['title' => 'Order History', 'orders' => $orders]);
@@ -42,7 +42,11 @@ class UserController extends BaseController {
         $avgRating = $ratingModel->getAverageRating($id);
         $ratingCount = $ratingModel->getRatingCount($id);
         $reviews = $ratingModel->getReviews($id);
-        $userRating = $ratingModel->getUserRating($_SESSION['user_id'], $id);
+        
+        $userRating = null;
+        if($this->isLoggedIn()){
+            $userRating = $ratingModel->getUserRating($_SESSION['user_id'], $id);
+        }
 
         $this->view('user/show_game', [
             'title' => $game['title'],
@@ -55,6 +59,7 @@ class UserController extends BaseController {
     }
 
     public function order($game_id) {
+        $this->requireLogin();
         // This method now INITIATES a game purchase order
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $gameModel = new GameModel($this->db);
