@@ -55,28 +55,36 @@ class UserController extends BaseController {
     }
 
     public function order($game_id) {
+        // This method now INITIATES a game purchase order
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $gameModel = new GameModel($this->db);
             $game = $gameModel->findById($game_id);
 
             if (!$game) {
-                $this->redirect('/');
+                $this->redirect('/'); // Game not found
+                return;
             }
-
-            $amount = $_POST['amount'] ?? $game['price'];
 
             $orderModel = new OrderModel($this->db);
-            $orderId = $orderModel->create($_SESSION['user_id'], $game_id, $amount);
+            // Create a new order for this specific game
+            $order_uid = $orderModel->create(
+                $_SESSION['user_id'],
+                $game['price'],      // Amount from the game record
+                $game['currency'],   // Currency from the game record
+                'game_purchase',     // Type of order
+                $game['id']          // The game being purchased
+            );
 
-            if ($orderId) {
-                // Simulate payment and completion
-                $orderModel->updateStatus($orderId, 'completed');
-                $this->redirect('/history?order_success=true');
+            if ($order_uid) {
+                // Redirect user to the payment simulation page
+                $this->redirect('/payment/simulate/' . $order_uid);
             } else {
-                $this->redirect('/game/' . $game_id . '?error=order_failed');
+                // Redirect back to the game page with an error
+                $this->redirect('/game/' . $game_id . '?error=order_creation_failed');
             }
         } else {
-             $this->redirect('/');
+            // Only POST method is allowed to create an order
+             $this->redirect('/game/' . $game_id);
         }
     }
 

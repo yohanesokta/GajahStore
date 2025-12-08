@@ -17,6 +17,14 @@ class BaseController {
     }
 
     protected function view($viewName, $data = []) {
+        // Diagnostic check for the 'intl' extension.
+        if (!class_exists('NumberFormatter')) {
+            die("FATAL ERROR: The 'intl' PHP extension is not installed or enabled. This extension is required for currency formatting to work. Please enable 'extension=intl' in your php.ini file.");
+        }
+
+        // Ensure helpers are always loaded before a view is rendered, using an absolute path.
+        require_once __DIR__ . '/../lib/helper.php';
+
         $viewPath = 'views/' . $viewName . '.php';
         if (file_exists($viewPath)) {
             extract($data); // Extracts array keys into variables

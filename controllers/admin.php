@@ -51,14 +51,16 @@ class AdminController extends BaseController {
             $title_post = $_POST['title'] ?? '';
             $genre = $_POST['genre'] ?? '';
             $platform_id = $_POST['platform_id'] ?? 0;
-            $price = $_POST['price'] ?? 0;
-            $image_url = $game['image_url'] ?? 'public/images/default_game.png'; // Keep old image if new one isn't uploaded
+            // Harga sekarang adalah integer, mata uang ditambahkan
+            $price = (int)($_POST['price'] ?? 0);
+            $currency = $_POST['currency'] ?? 'USD';
+            
+            $image_url = $game['image_url'] ?? null;
 
-            // Handle file upload
+            // Logika upload file
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
                 $target_dir = "public/images/";
-                // Create directory if it doesn't exist
-                if (!file_exists($target_dir)) {
+                if (!is_dir($target_dir)) {
                     mkdir($target_dir, 0777, true);
                 }
                 $safe_filename = uniqid() . '_' . basename($_FILES["image"]["name"]);
@@ -68,10 +70,10 @@ class AdminController extends BaseController {
                 }
             }
 
-            if ($id) { // Update existing game
-                $gameModel->update($id, $title_post, $genre, $platform_id, $price, $image_url);
-            } else { // Create new game
-                $gameModel->create($title_post, $genre, $platform_id, $price, $image_url);
+            if ($id) { // Update game
+                $gameModel->update($id, $title_post, $genre, $platform_id, $price, $currency, $image_url);
+            } else { // Buat game baru
+                $gameModel->create($title_post, $genre, $platform_id, $price, $currency, $image_url);
             }
             $this->redirect('/admin/games');
         }
@@ -80,6 +82,19 @@ class AdminController extends BaseController {
             'title' => $title,
             'game' => $game,
             'platforms' => $platforms
+        ]);
+    }
+    
+    /**
+     * Menampilkan halaman laporan game terlaris.
+     */
+    public function topSelling() {
+        $gameModel = new GameModel($this->db);
+        $topGames = $gameModel->topSelling(5); // Ambil top 5
+
+        $this->view('admin/report_top_selling', [
+            'title' => 'Top 5 Selling Games',
+            'topGames' => $topGames
         ]);
     }
     

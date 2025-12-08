@@ -1,6 +1,9 @@
 <?php
+// views/admin/edit_game.php
 $game = $data['game'] ?? null;
 $isEdit = $game !== null;
+// Tambahkan daftar mata uang yang didukung
+$currencies = ['IDR', 'USD', 'EUR', 'GBP', 'JPY'];
 ?>
 <div class="form-container">
     <h2><?= $isEdit ? 'Edit Game' : 'Add New Game' ?></h2>
@@ -25,23 +28,37 @@ $isEdit = $game !== null;
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="form-group">
-            <label for="price">Price</label>
-            <input type="number" id="price" name="price" step="1000" value="<?= htmlspecialchars($game['price'] ?? '') ?>" required>
+        
+        <div class="form-group" style="display: flex; gap: 1rem;">
+            <div style="flex: 2;">
+                <label for="price">Price </label>
+                <input type="number" id="price" name="price" step="1" value="<?= htmlspecialchars($game['price'] ?? '') ?>" required>
+            </div>
+            <div style="flex: 1;">
+                <label for="currency">Currency</label>
+                <select id="currency" name="currency" required>
+                    <?php foreach ($currencies as $currency_code): ?>
+                        <option value="<?= $currency_code ?>" <?= ($game['currency'] ?? 'USD') == $currency_code ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($currency_code) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
+
         <div class="form-group">
             <label for="image">Game Image</label>
             <input type="file" id="image" name="image" accept="image/*">
             <?php if ($isEdit && $game['image_url']): ?>
                 <div class="current-image" style="margin-top: 1rem;">
-                    <p style="font-size: 0.9rem; color: var(--color-grey);">Current image:</p>
+                    <p>Current image:</p>
                     <img src="/<?= htmlspecialchars($game['image_url']) ?>" alt="Current Image" style="max-width: 150px; border-radius: 0.5rem; margin-top: 0.5rem;">
                 </div>
             <?php endif; ?>
         </div>
         <div class="form-actions" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-            <button type="submit" class="btn" style="flex-grow: 1;"><?= $isEdit ? 'Update Game' : 'Add Game' ?></button>
-            <a href="/admin/games" class="btn btn-secondary" style="flex-grow: 1;">Cancel</a>
+            <button type="submit" class="btn"><?= $isEdit ? 'Update Game' : 'Add Game' ?></button>
+            <a href="/admin/games" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 </div>
