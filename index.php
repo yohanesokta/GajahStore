@@ -72,7 +72,7 @@ if ($controllerName === 'home' || $controllerName === '' || $controllerName === 
     if ($userController) $userController->show($methodName); else notFound();
 
 } elseif ($controllerName === 'order' && $methodName) {
-    $userController = loadController('user', 'order');
+    $userController = loadController('user', $pdo);
     if ($userController) $userController->order($methodName); else notFound();
 
 } elseif ($controllerName === 'rate' && $methodName) {
