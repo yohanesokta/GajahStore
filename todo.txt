@@ -1,0 +1,19 @@
+- [x] Buat struktur folder dan file awal.
+- [x] Buat file `config.php` untuk koneksi database.
+- [x] Rancang dan buat skema database di `models/database.sql`.
+- [x] Buat `UserModel.php` untuk otentikasi dan manajemen pengguna.
+- [x] Buat `GameModel.php` untuk operasi CRUD game.
+- [x] Buat `OrderModel.php` untuk mengelola transaksi.
+- [x] Buat `RatingModel.php` untuk mengelola rating game.
+- [x] Buat `AdminModel.php` untuk fungsionalitas khusus admin.
+- [x] Implementasikan `controllers/auth.php` untuk login dan register.
+- [x] Implementasikan `controllers/user.php` untuk dasbor pengguna.
+- [x] Implementasikan `controllers/admin.php` untuk dasbor admin.
+- [x] Buat `views/login.php` dan `views/register.php`.
+- [x] Buat `views/user_dashboard.php`, `views/game_list.php`, `views/transaction_history.php`.
+- [x] Buat `views/admin_dashboard.php`, `views/manage_games.php`, `views/manage_users.php`.
+- [x] Atur routing di `index.php`.
+- [x] Buat file CSS untuk tampilan di `public/css/style.css`.
+- [x] Pastikan semua query menggunakan prepared statements.
+- [x] Tambahkan validasi dan sanitasi input.
+- [x] Selesaikan dokumentasi dan pembersihan kode.
