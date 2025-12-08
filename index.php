@@ -1,4 +1,5 @@
 <?php
+ob_start();
 // Main Entry Point & Router
 
 // 1. Setup
@@ -10,7 +11,7 @@ if (session_status() == PHP_SESSION_NONE) {
 // Load configuration and base files
 require_once 'config/config.php';
 require_once 'controllers/base.php';
-require_once 'lib/helper.php'; // Pastikan helper diload
+
 
 // 2. Database Connection
 try {
