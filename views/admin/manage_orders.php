@@ -21,7 +21,7 @@
                 <?php foreach ($data['orders'] as $order): ?>
                     <tr>
                         <td>#<?= htmlspecialchars($order['id']) ?></td>
-                        <td><?= date('d M Y, H:i', strtotime($order['order_date'])) ?></td>
+                        <td><?= date('d M Y, H:i', strtotime($order['updated_at'])) ?></td>
                         <td><?= htmlspecialchars($order['user_name']) ?></td>
                         <td><?= htmlspecialchars($order['game_title']) ?></td>
                         <td>Rp. <?= number_format($order['amount']) ?></td>

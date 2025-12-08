@@ -21,14 +21,19 @@
             <tbody>
                 <?php foreach ($data['orders'] as $order): ?>
                     <tr>
-                        <td>#<?= htmlspecialchars($order['id']) ?></td>
+                        <td>#<?= $order['order_uid']?></td>
                         <td><?= date('d M Y, H:i', strtotime($order['order_date'])) ?></td>
                         <td>
                             <img src="/<?= htmlspecialchars($order['game_image']) ?>" alt="" style="width: 40px; border-radius: 4px; vertical-align: middle; margin-right: 10px;">
                             <?= htmlspecialchars($order['game_title']) ?>
                         </td>
                         <td>Rp. <?= number_format($order['amount']) ?></td>
-                        <td><span class="status status-<?= htmlspecialchars($order['status']) ?>"><?= ucfirst(htmlspecialchars($order['status'])) ?></span></td>
+                        <td>
+                        <span class="status status-<?= htmlspecialchars($order['status']) ?>"><?= ucfirst(htmlspecialchars($order['status'])) ?></span>
+                        <?php if ($order['status'] == 'pending') { ?>
+                        <a style="background-color:green; color:white; padding:5px 10px; border-radius:20px; font-size:11pt;" href="/payment/simulate/<?= $order['order_uid']?>">Bayar</a>    
+                        <?php } ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

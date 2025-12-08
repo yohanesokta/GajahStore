@@ -7,7 +7,7 @@
             <p><?= htmlspecialchars($game['genre']) ?> | <?= htmlspecialchars($game['platform_name']) ?></p>
             <div class="rating-summary">
                 <span class="stars" style="--rating: <?= $data['avgRating'] ?>;" title="Average rating: <?= $data['avgRating'] ?> out of 5"></span>
-                <span>(<?= number_format($data['avgRating'], 1) ?>/5.0) based on <?= $data['ratingCount'] ?> reviews</span>
+                <span>(<?= $data['avgRating'] ?? 0 ?>/5.0) based on <?= $data['ratingCount'] ?> reviews</span>
             </div>
             <div class="price">Rp. <?= number_format($game['price']) ?></div>
             
@@ -37,7 +37,7 @@
                     <form action="/rate/<?= $game['id'] ?>" method="POST">
                         <div class="form-group">
                             <label>Your Rating</label>
-                            <div class="star-rating">
+                            <div class="star-rating" style='display:flex; width:100%; justify-content:center;'>
                                 <input type="radio" id="star5" name="rating" value="5" <?= ($data['userRating']['rating'] ?? 0) == 5 ? 'checked' : '' ?>/><label for="star5" title="5 stars">★</label>
                                 <input type="radio" id="star4" name="rating" value="4" <?= ($data['userRating']['rating'] ?? 0) == 4 ? 'checked' : '' ?>/><label for="star4" title="4 stars">★</label>
                                 <input type="radio" id="star3" name="rating" value="3" <?= ($data['userRating']['rating'] ?? 0) == 3 ? 'checked' : '' ?>/><label for="star3" title="3 stars">★</label>

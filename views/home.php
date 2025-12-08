@@ -11,7 +11,7 @@
 
 <div class="search-bar">
     <form action="/" method="GET">
-        <input type="text" name="search" placeholder="Search for any game..." value="<?= htmlspecialchars($data['searchTerm'] ?? '') ?>">
+        <input type="text" name="search" style="padding:0 10px;" placeholder="Search for any game..." value="<?= htmlspecialchars($data['searchTerm'] ?? '') ?>">
         <button type="submit" class="btn">Search</button>
     </form>
 </div>

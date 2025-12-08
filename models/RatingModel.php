@@ -22,7 +22,7 @@ class RatingModel {
         $stmt = $this->db->prepare("SELECT AVG(rating) as average_rating FROM ratings WHERE game_id = ?");
         $stmt->execute([$game_id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result ? round($result['average_rating'], 1) : 0;
+        return $result ? $result['average_rating'] : 0;
     }
     
     public function getRatingCount($game_id) {
