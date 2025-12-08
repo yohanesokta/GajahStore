@@ -5,6 +5,7 @@
     <table class="styled-table">
         <thead>
             <tr>
+                <th>No</th>
                 <th>ID</th>
                 <th>Image</th>
                 <th>Title</th>
@@ -20,8 +21,9 @@
                     <td colspan="7" style="text-align: center;">No games found.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($data['games'] as $game): ?>
+                <?php $no=0; foreach ($data['games'] as $game): $no++;?>
                     <tr>
+                        <td><?=$no?></td>
                         <td><?= $game['id'] ?></td>
                         <td><img src="/<?= htmlspecialchars($game['image_url']) ?>" alt="" style="width: 50px; border-radius: 4px;"></td>
                         <td><?= htmlspecialchars($game['title']) ?></td>
