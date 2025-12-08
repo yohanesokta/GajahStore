@@ -1,0 +1,32 @@
+<?php
+class Middleware
+{
+    private function admin(array $userdata) {
+        if ($userdata['role'] != "admin") {
+            return Redirect("/auth");
+        }
+    }
+
+    private function users(array $userdata) {
+        if ($userdata['role'] != "user") {
+            return Redirect("/auth");
+        }
+    }
+
+    public function handle($role)
+    {
+        session_start();
+        if (isset($_SESSION['userdata'])) {
+            switch ($role) {
+                case 'admin':
+                    $this->admin($_SESSION['userdata']);
+                    break;
+                case "user" :
+                    $this->users($_SESSION["userdata"]);
+                    break;
+            }
+        } else {
+            Redirect("/auth");
+        }
+    }
+}
