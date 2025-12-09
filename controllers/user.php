@@ -27,7 +27,8 @@ class UserController extends BaseController {
     public function history() {
         $this->requireLogin();
         $transaksiModel = new TransaksiModel($this->db);
-        $transaksi = $transaksiModel->findByUser($_SESSION['user_id']);
+        $id_pengguna = (int)$_SESSION['user_id'];
+        $transaksi = $transaksiModel->findByUser($id_pengguna);
         
         // Untuk setiap transaksi, ambil detail itemnya
         foreach ($transaksi as $key => $t) {
@@ -55,7 +56,7 @@ class UserController extends BaseController {
         // Ambil rating dari user yang sedang login
         $userRating = null;
         if($this->isLoggedIn()){
-            $userRating = $ratingModel->getUserRating($_SESSION['user_id'], $id);
+            $userRating = $ratingModel->getUserRating((int)$_SESSION['user_id'], $id);
         }
 
         // Ambil jumlah stok yang tersedia
@@ -92,7 +93,7 @@ class UserController extends BaseController {
         }
 
         // 2. Buat transaksi sewa dengan status 'pending'
-        $id_pengguna = $_SESSION['user_id'];
+        $id_pengguna = (int)$_SESSION['user_id'];
         $id_kasets = [$availableKaset['IDKaset']]; // Sewa satu kaset
         $tgl_kembali = date('Y-m-d', strtotime('+7 days')); // Durasi sewa 7 hari
 
@@ -115,7 +116,7 @@ class UserController extends BaseController {
 
             if ($rating) {
                 $ratingModel = new RatingModel($this->db);
-                $ratingModel->create($_SESSION['user_id'], $game_id, $rating, $review);
+                $ratingModel->create((int)$_SESSION['user_id'], $game_id, $rating, $review);
                 $this->redirect('/game/' . $game_id . '?rated=true');
             } else {
                 $this->redirect('/game/' . $game_id . '?error=rating_missing');

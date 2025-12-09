@@ -63,11 +63,11 @@ CREATE TABLE `kaset` (
 -- Struktur tabel untuk `transaksisewa` (Header Transaksi)
 --
 CREATE TABLE `transaksisewa` (
-  `NomorNota` varchar(20) NOT NULL,
+  `NomorNota` varchar(32) NOT NULL,
   `IDPengguna` int(11) NOT NULL,
   `TglSewa` date NOT NULL,
   `TglWajibKembali` date NOT NULL,
-  `Status` enum('active','completed','cancelled') NOT NULL DEFAULT 'active',
+  `Status` enum('active','completed','cancelled','pending') NOT NULL DEFAULT 'pending',
   `TglTransaksi` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`NomorNota`),
   KEY `fk_transaksi_pengguna` (`IDPengguna`)
@@ -79,7 +79,7 @@ CREATE TABLE `transaksisewa` (
 -- Struktur tabel untuk `detailsewa` (Detail Transaksi)
 --
 CREATE TABLE `detailsewa` (
-  `NomorNota` varchar(20) NOT NULL,
+  `NomorNota` varchar(32) NOT NULL,
   `IDKaset` int(11) NOT NULL,
   PRIMARY KEY (`NomorNota`, `IDKaset`),
   KEY `fk_detail_kaset` (`IDKaset`)
