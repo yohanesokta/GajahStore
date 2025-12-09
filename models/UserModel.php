@@ -14,7 +14,7 @@ class UserModel {
     }
 
     public function login($email, $password) {
-        $stmt = $this->db->prepare("SELECT * FROM pengguna WHERE Email = ?");
+        $stmt = $this->db->prepare("SELECT IDPengguna, Nama, Role , Password FROM pengguna WHERE Email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
