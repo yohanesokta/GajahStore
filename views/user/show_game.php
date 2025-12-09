@@ -1,4 +1,5 @@
 <?php $game = $data['game']; ?>
+
 <div class="game-detail-container">
     <div class="game-header">
         <img src="/<?= htmlspecialchars($game['URLGambar']) ?>" alt="<?= htmlspecialchars($game['Judul']) ?>">

@@ -1,12 +1,4 @@
---
--- Skema Basis Data untuk Aplikasi Persewaan Kaset Game
---
 
--- --------------------------------------------------------
-
---
--- Struktur tabel untuk `pengguna`
---
 CREATE TABLE `pengguna` (
   `IDPengguna` int(11) NOT NULL AUTO_INCREMENT,
   `Nama` varchar(255) NOT NULL,
@@ -17,23 +9,12 @@ CREATE TABLE `pengguna` (
   UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Struktur tabel untuk `platform`
---
 CREATE TABLE `platform` (
   `IDPlatform` int(11) NOT NULL AUTO_INCREMENT,
   `NamaPlatform` varchar(100) NOT NULL,
   PRIMARY KEY (`IDPlatform`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
--- --------------------------------------------------------
-
---
--- Struktur tabel untuk `game`
---
 CREATE TABLE `game` (
   `IDGame` int(11) NOT NULL AUTO_INCREMENT,
   `Judul` varchar(150) NOT NULL,
@@ -44,11 +25,6 @@ CREATE TABLE `game` (
   KEY `fk_game_platform` (`IDPlatform`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Struktur tabel untuk `kaset` (Inventaris)
---
 CREATE TABLE `kaset` (
   `IDKaset` int(11) NOT NULL AUTO_INCREMENT,
   `IDGame` int(11) NOT NULL,
@@ -57,11 +33,6 @@ CREATE TABLE `kaset` (
   KEY `fk_kaset_game` (`IDGame`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Struktur tabel untuk `transaksisewa` (Header Transaksi)
---
 CREATE TABLE `transaksisewa` (
   `NomorNota` varchar(32) NOT NULL,
   `IDPengguna` int(11) NOT NULL,
@@ -73,11 +44,6 @@ CREATE TABLE `transaksisewa` (
   KEY `fk_transaksi_pengguna` (`IDPengguna`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Struktur tabel untuk `detailsewa` (Detail Transaksi)
---
 CREATE TABLE `detailsewa` (
   `NomorNota` varchar(32) NOT NULL,
   `IDKaset` int(11) NOT NULL,
@@ -85,11 +51,6 @@ CREATE TABLE `detailsewa` (
   KEY `fk_detail_kaset` (`IDKaset`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Struktur tabel untuk `rating`
---
 CREATE TABLE `rating` (
   `IDRating` int(11) NOT NULL AUTO_INCREMENT,
   `IDPengguna` int(11) NOT NULL,
@@ -101,11 +62,6 @@ CREATE TABLE `rating` (
   KEY `fk_rating_pengguna` (`IDPengguna`),
   KEY `fk_rating_game` (`IDGame`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
---
--- Constraints
---
 
 ALTER TABLE `game`
   ADD CONSTRAINT `fk_game_platform` FOREIGN KEY (`IDPlatform`) REFERENCES `platform` (`IDPlatform`) ON DELETE CASCADE ON UPDATE CASCADE;

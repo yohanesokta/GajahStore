@@ -50,6 +50,7 @@ class AuthController extends BaseController {
             }
             if ($password !== $confirm_password) {
                 $errors[] = "Passwords do not match.";
+                
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = "Invalid email format.";

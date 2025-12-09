@@ -1,19 +1,14 @@
 <?php
 ob_start();
-// Main Entry Point & Router
 
-// 1. Setup
-// Start session for user authentication
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Load configuration and base files
+
 require_once 'config/config.php';
 require_once 'controllers/base.php';
 
-
-// 2. Database Connection
 try {
     $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -22,17 +17,17 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// 3. Simple, Clean Routing
+
 $request_uri = $_SERVER['REQUEST_URI'];
 $request_path = parse_url($request_uri, PHP_URL_PATH);
 $path_parts = explode('/', trim($request_path, '/'));
 
-$controllerName = $path_parts[0] ?: 'home'; // Default to 'home' for the root URL
+$controllerName = $path_parts[0] ?: 'home'; 
 $methodName = $path_parts[1] ?? 'index';
 $param1 = $path_parts[2] ?? null;
 $param2 = $path_parts[3] ?? null;
 
-// Helper to load controllers
+
 function loadController($name, $db) {
     $controllerFile = "controllers/{$name}.php";
     if (file_exists($controllerFile)) {
@@ -45,14 +40,12 @@ function loadController($name, $db) {
     return null;
 }
 
-// --- Route Definitions ---
 
-// Home Page
 if ($controllerName === 'home' || $controllerName === '' || $controllerName === 'index.php') {
     $userController = loadController('user', $pdo);
     if ($userController) $userController->index(); else notFound();
 
-// Authentication
+
 } elseif ($controllerName === 'login') {
     $authController = loadController('auth', $pdo);
     if ($authController) $authController->login(); else notFound();
@@ -65,49 +58,49 @@ if ($controllerName === 'home' || $controllerName === '' || $controllerName === 
     $authController = loadController('auth', $pdo);
     if ($authController) $authController->logout(); else notFound();
 
-// User-specific actions
+
 } elseif ($controllerName === 'history') {
     $userController = loadController('user', $pdo);
     if ($userController) $userController->history(); else notFound();
 
-// Display single game
+
 } elseif ($controllerName === 'game' && $methodName) {
     $userController = loadController('user', $pdo);
     if ($userController) $userController->show($methodName); else notFound();
 
-// Game Rental (Initiates rental flow)
+
 } elseif ($controllerName === 'rent' && $methodName) {
     $userController = loadController('user', $pdo);
     if ($userController) $userController->rent($methodName); else notFound();
 
-// Payment Processing
+
 } elseif ($controllerName === 'payment' && $methodName) {
     $paymentController = loadController('payment', $pdo);
     if (!$paymentController) { notFound(); }
 
-    // /payment/simulate/[order_uid]
-    // /payment/confirm/[order_uid]
-    // /payment/success/[order_uid]
+    
+    
+    
     if (in_array($methodName, ['simulate', 'confirm', 'success']) && $param1) {
         $paymentController->$methodName($param1);
     } else {
         notFound();
     }
 
-// Game Rating
+
 } elseif ($controllerName === 'rate' && $methodName) {
     $userController = loadController('user', $pdo);
     if ($userController) $userController->rate($methodName); else notFound();
 
-// Admin Panel
+
 } elseif ($controllerName === 'admin') {
     $adminController = loadController('admin', $pdo);
     if (!$adminController) { notFound(); }
     
-    // /admin -> index()
-    // /admin/games -> games()
-    // /admin/games/edit/1 -> editGame(1)
-    // /admin/games/new -> editGame()
+    
+    
+    
+    
     if ($methodName === 'index' && !$param1) {
         $adminController->index();
     } elseif ($methodName === 'games') {
@@ -120,14 +113,14 @@ if ($controllerName === 'home' || $controllerName === '' || $controllerName === 
         elseif ($param1 === 'new') $adminController->editUser();
         elseif ($param1 === 'delete' && $param2) $adminController->deleteUser($param2);
         else $adminController->users();
-    } elseif ($methodName === 'transaksi') { // Renamed from 'orders'
+    } elseif ($methodName === 'transaksi') { 
         $adminController->transaksi();
-    } elseif ($methodName === 'addstock' && $param1 && $_SERVER['REQUEST_METHOD'] === 'POST') { // New route for adding stock
+    } elseif ($methodName === 'addstock' && $param1 && $_SERVER['REQUEST_METHOD'] === 'POST') { 
         $adminController->addStock($param1);
-    } elseif ($methodName === 'deletekaset' && $param1 && $param2) { // New route for deleting a kaset
+    } elseif ($methodName === 'deletekaset' && $param1 && $param2) { 
         $adminController->deleteKaset($param1, $param2);
     } else {
-        // Fallback for any other /admin/method calls
+        
         if(method_exists($adminController, $methodName)) {
             $adminController->$methodName();
         } else {
